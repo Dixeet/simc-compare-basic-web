@@ -1,4 +1,13 @@
-#input-simc {
-    background-color: #2C3E50;
-    color: #fff;
+hr {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border: 0;
+    border-top-color: currentcolor;
+    border-top-style: none;
+    border-top-width: 0px;
+    border-top: 1px solid white;
+}
+
+#section-gear {
+    /*display: none;*/
 }
