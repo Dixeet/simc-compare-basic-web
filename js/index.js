@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    // parseSimc();
+    parseSimc();
 });
 
 var partsSlot = [
@@ -51,13 +51,6 @@ function parseSimc() {
     createGearDom();
     getGearData(gear);
 
-
-    // jQuery.get("https://www.wowhead.com/tooltip/item/159252&json&power&bonus=4819:1512:4786&azerite-powers=123:30", function (data) {
-    //     console.log('data');
-    //     console.log(data);
-    // });
-
-
     return false;
 }
 
@@ -108,7 +101,7 @@ function createGearDom() {
     var $currentRow = '';
     partsSlot.forEach(function (slot, index) {
         if ((index) % 3 === 0) {
-            $currentRow = $("<div class='row mb-3'></div>");
+            $currentRow = $("<div class='row mb-5 pt-2'></div>");
             $gearSection.append($currentRow);
         }
         $currentRow.append("<div class='col-4' id='" + 'gear-' + slot + "'" + "><h4 class='text-uppercase'>" + slot + "</h4></div>");
@@ -118,19 +111,49 @@ function createGearDom() {
 function getGearData(gear) {
     Object.keys(gear.equipped).forEach(function (slot) {
         var $currentCol = $("#gear-" + slot);
+        var waiting = 0;
         gear.equipped[slot].forEach(function (part) {
             var item = getPartInfos(part);
             var itemUrl = getUrl(item);
             $.get(itemUrl, function (data) {
                 console.log(data);
-                $currentCol.append("<div><a href='https://www.wowhead.com/item=" + item.id + "'>" + data.name_enus + "</a></div>");
+                item.ilvl = getIlvl(data.tooltip_enus);
+                $currentCol.append(
+                    "<div class='equipped mb-2 p-2 border border-warning'>" +
+                    "<a href='https://www.wowhead.com/item=" + item.id + "/" + getDetailItemUrlParams(item) + "'>" +
+                    data.name_enus +
+                    "</a>" +
+                    "<div><small>" + "ilvl: "+ item.ilvl +
+                    "</small></div>" +
+                    "</div>");
+                waiting++;
+                if (waiting === gear.equipped[slot].length) {
+                    loadTooltip(200);
+                }
             })
         });
-        // gear.bag[slot].forEach(function (part) {
-        //     $currentCol.append("<div>" + part + "</div>");
-        // });
+        gear.bag[slot].forEach(function (part) {
+            var item = getPartInfos(part);
+            var itemUrl = getUrl(item);
+            $.get(itemUrl, function (data) {
+                console.log(data);
+                item.ilvl = getIlvl(data.tooltip_enus);
+                $currentCol.append(
+                    "<div class='bag mb-2 p-2 border border-white'>" +
+                    // "<a href='https://www.wowhead.com/item=" + item.id + " data-wowhead='item=" + item.id + "/" + getDetailItemUrlParams(item) + "'>" +
+                    "<a href='https://www.wowhead.com/item=" + item.id + "/" + getDetailItemUrlParams(item) + "'>" +
+                    data.name_enus +
+                    "</a>" +
+                    "<div><small>" + "ilvl: "+ item.ilvl +
+                    "</small></div>" +
+                    "</div>");
+                waiting++;
+                if (waiting === gear.equipped[slot].length) {
+                    loadTooltip(200);
+                }
+            })
+        });
     });
-    loadTooltip();
 }
 
 function getPartInfos(line) {
@@ -139,6 +162,10 @@ function getPartInfos(line) {
         bonus: getBonus(line),
         azerite: getAzerite(line)
     }
+}
+
+function getIlvl(str) {
+    return str.split('<!--ilvl-->')[1].slice(0, 3);
 }
 
 function getId(line) {
@@ -160,28 +187,32 @@ function getAzerite(line) {
 }
 
 function getUrl(item) {
-    //https://www.wowhead.com/tooltip/item/159252&json&power&bonus=4819:1512:4786&azerite-powers=123:30
     var baseUrl = "https://www.wowhead.com/tooltip/item/" + item.id + "&json&power";
-    if (item.bonus.length > 0){
+    baseUrl += getDetailItemUrlParams(item);
+    return baseUrl;
+}
+
+function getDetailItemUrlParams(item) {
+    var baseUrl = '';
+    if (item.bonus.length > 0) {
         baseUrl += "&bonus=";
-        item.bonus.forEach(function(bonus, index){
+        item.bonus.forEach(function (bonus, index) {
             baseUrl += (index === 0 ? '' : ':') + bonus;
         })
     }
 
-    if (item.azerite.length > 0){
+    if (item.azerite.length > 0) {
         baseUrl += "&azerite-powers=";
-        item.azerite.forEach(function(azerite, index){
+        item.azerite.forEach(function (azerite, index) {
             baseUrl += (index === 0 ? '' : ':') + azerite;
         })
     }
-
     return baseUrl;
 }
 
-function loadTooltip() {
+function loadTooltip(time) {
     setTimeout(function () {
         $("body").append("<script src=\"https://wow.zamimg.com/widgets/power.js\"></script>");
-    }, 500);
+    }, !!time ? time : 500);
 }
 
