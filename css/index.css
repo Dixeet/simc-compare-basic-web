@@ -8,12 +8,16 @@ hr {
     border-top: 1px solid white;
 }
 
-#section-gear, #section-loading {
+#section-gear, #section-loading, #section-result, #form-result {
     display: none;
 }
 
 .pointer {
     cursor: pointer
+}
+
+.bold {
+    font-weight: bold;
 }
 
 .lds-ring {

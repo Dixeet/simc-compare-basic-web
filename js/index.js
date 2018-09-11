@@ -4,7 +4,7 @@ $(document).ready(function () {
         parseSimc();
         return false;
     });
-    // parseSimc();
+    parseSimc();
 });
 
 var partsSlot = [
@@ -40,6 +40,7 @@ var baseGearObj = {
 };
 
 var selectedGear = $.extend(true, {}, baseGearObj);
+var combinations = [];
 
 function parseSimc() {
     console.log("input simc faked");
@@ -55,12 +56,19 @@ function parseSimc() {
 
     getGearData(gear);
 
-    return false;
+    $('#compare-btn').click(function () {
+        combinations = compare(selectedGear);
+        displayResult(simcInput, combinations);
+    });
+
 }
 
 function resetDom() {
     $('#section-gear').hide();
+    $('#section-result').hide();
     $('#section-loading').show();
+    selectedGear = $.extend(true, {}, baseGearObj);
+    combinations = [];
 }
 
 function removeWowhead() {
@@ -138,7 +146,7 @@ function getGearData(gear) {
                 item.ilvl = getIlvl(data.tooltip_enus);
                 $currentCol.append(
                     "<div class='equipped mb-2 p-2 border border-warning'>" +
-                    "<a target='_blank' href='https://www.wowhead.com/item=" + item.id + "/" + getDetailItemUrlParams(item) + "'>" +
+                    "<a class='bold' target='_blank' href='https://www.wowhead.com/item=" + item.id + "/" + getDetailItemUrlParams(item) + "'>" +
                     data.name_enus +
                     "</a>" +
                     "<div><small>" + "ilvl: "+ item.ilvl +
@@ -153,7 +161,7 @@ function getGearData(gear) {
             $.get(itemUrl, function (data) {
                 item.ilvl = getIlvl(data.tooltip_enus);
                 $currentCol.append(
-                    "<div class='bag mb-2 p-2 border border-white pointer' onclick='toggleGear(this, \"" + part+ "\")'>" +
+                    "<div class='bag mb-2 p-2 border border-white pointer' onclick='toggleGear(this, \"" + part+ "\", \"" + data.name_enus.replace("'", "") + "\")'>" +
                     // "<a href='https://www.wowhead.com/item=" + item.id + " data-wowhead='item=" + item.id + "/" + getDetailItemUrlParams(item) + "'>" +
                     "<a target='_blank' href='https://www.wowhead.com/item=" + item.id + "/" + getDetailItemUrlParams(item) + "'>" +
                     data.name_enus +
@@ -259,18 +267,89 @@ function loadTooltip(time) {
         setTimeout(function () {
             $('#section-loading').hide();
             $('#section-gear').show();
+            $('#section-result').show();
         }, 100);
     }, !!time ? time : 500);
 }
 
-function toggleGear(el, part){
+function toggleGear(el, part, name) {
     var slot = getSlot(part);
     if (selectedGear[slot].indexOf(part) !== -1) {
-        $(el).removeClass('border-info').addClass('border-white');
+        $(el).removeClass('border-info').addClass('border-white').removeClass('bold');
         selectedGear[slot].splice(selectedGear[slot].indexOf(part), 1);
     } else {
-        $(el).removeClass('border-white').addClass('border-info');
-        selectedGear[slot].push(part);
+        $(el).removeClass('border-white').addClass('border-info').addClass('bold');
+        selectedGear[slot].push(
+            {
+                line: part,
+                name: name
+            }
+        );
     }
     console.log(selectedGear);
+}
+
+function compare(set) {
+    var combinations = [];
+
+    initSet(set);
+
+    function initSet(set) {
+        var tmpSet = Object.assign({}, set);
+        Object.keys(tmpSet).forEach(function (key) {
+            if (tmpSet[key].length === 0) {
+                delete tmpSet[key];
+            } else {
+                if (key === 'finger' || key === 'trinket') {
+                    // tmpSet[key + "1"] = tmpSet[key].slice();
+                    tmpSet[key + "1"] = $.extend(true, [], tmpSet[key]);
+                    // tmpSet[key + "2"] = tmpSet[key].slice();
+                    tmpSet[key + "2"] = $.extend(true, [], tmpSet[key]);
+                    tmpSet[key + "2"].forEach(function (part, idx) {
+                        tmpSet[key + "2"][idx].line = part.line.replace(key + "1", key + "2");
+                    });
+                    delete tmpSet[key];
+                }
+            }
+        });
+        getComb(tmpSet, []);
+    }
+
+
+    function getComb(set, currComb, prevRingTrinket) {
+        var tmpSet = Object.assign({}, set);
+        var tmpKeys = Object.keys(tmpSet);
+        tmpKeys.forEach(function (key) {
+            tmpSet[key].forEach(function (part) {
+                var tmpSet2 = Object.assign({}, tmpSet);
+                // var tmpComb = currComb.slice();
+                var tmpComb = $.extend(true, [], currComb);
+                if (key === 'finger2' || key === 'trinket2') {
+                    if (!prevRingTrinket || (prevRingTrinket.replace("finger1", "finger") !== part.line.replace("finger2", "finger") &&
+                        prevRingTrinket.replace("trinket1", "trinket") !== part.line.replace("trinket2", "trinket"))) {
+                        tmpComb.push(part);
+                        combinations.push(tmpComb);
+                    }
+
+                } else {
+                    tmpComb.push(part);
+                    combinations.push(tmpComb);
+                }
+                delete tmpSet2[key];
+                if (key === 'finger1' || key === 'trinket1'){
+                    getComb(tmpSet2, tmpComb, part.line);
+                } else {
+                    getComb(tmpSet2, tmpComb);
+                }
+
+            });
+            delete tmpSet[key];
+        });
+    }
+
+    return combinations;
+}
+
+function displayInput(simcInput, combinations){
+
 }
