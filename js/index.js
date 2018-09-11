@@ -12,10 +12,8 @@ var partsSlot = [
     'waist',
     'legs',
     'feet',
-    'finger1',
-    'finger2',
-    'trinket1',
-    'trinket2',
+    'finger',
+    'trinket',
     'main_hand',
     'off_hand'
 ];
@@ -30,10 +28,8 @@ var baseGearObj = {
     waist: [],
     legs: [],
     feet: [],
-    finger1: [],
-    finger2: [],
-    trinket1: [],
-    trinket2: [],
+    finger: [],
+    trinket: [],
     main_hand: [],
     off_hand: []
 };
