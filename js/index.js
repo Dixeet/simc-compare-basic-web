@@ -361,7 +361,7 @@ function displayResult(simcInput, combinations){
     var simcLines = simcInput.split('\n');
     var charName = getCharName(simcLines);
     var resultString = '';
-    resultString += cleanCommentsSimc(simcLines);
+    // resultString += cleanCommentsSimc(simcLines);
     resultString += getCombinationString(combinations, charName);
     $('#input-result').val(resultString);
     $('#form-result').show();
