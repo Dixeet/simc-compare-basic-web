@@ -274,7 +274,7 @@ function loadTooltip(time) {
 
 function toggleGear(el, part, name) {
     var slot = getSlot(part);
-    if (selectedGear[slot].indexOf(part) !== -1) {
+    if (gearAllreadySelected(name, slot)) {
         $(el).removeClass('border-info').addClass('border-white').removeClass('bold');
         selectedGear[slot].splice(selectedGear[slot].indexOf(part), 1);
     } else {
@@ -286,6 +286,12 @@ function toggleGear(el, part, name) {
             }
         );
     }
+}
+
+function gearAllreadySelected(name, slot){
+    return selectedGear[slot].some(function(gear){
+        return gear.name === name;
+    })
 }
 
 function compare(set) {
