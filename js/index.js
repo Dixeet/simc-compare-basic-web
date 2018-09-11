@@ -1,6 +1,9 @@
 $(document).ready(function () {
     if(!!Cookies.get('simc')) {
-        $('#input-simc').val(Cookies.get('simc'));
+        var cookie = Cookies.get('simc');
+        if (!!cookie) {
+            $('#input-simc').val(LZUTF8.decompress(cookie, {inputEncoding: "Base64"}));
+        }
     }
     $('#parse-btn').click(function (e) {
         e.preventDefault(e);
@@ -55,7 +58,7 @@ function parseSimc() {
 
         createGearDom();
         var simcInput = $('#input-simc').val();
-        Cookies.set('simc', simcInput);
+        Cookies.set('simc', LZUTF8.compress(simcInput, {outputEncoding: "Base64"}));
         var simcLines = simcInput.split('\n');
         var gear = getGear(simcLines);
         getGearData(gear);
