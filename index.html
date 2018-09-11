@@ -11,7 +11,7 @@
 
     <title>Simulationcraft Compare</title>
 </head>
-<body>
+<body class="mb-5">
 
 <header class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">Simulationcraft Compare</a>
@@ -56,7 +56,6 @@
     <div class="container">
         <h2>Result</h2>
         <hr>
-        <button id="compare-btn" class="btn btn-primary">Compare</button>
         <form id="form-result">
             <div class="form-group">
                 <label for="input-result">Copy the result into simulationcraft "simulate" tab</label>
@@ -65,6 +64,10 @@
         </form>
     </div>
 </section>
+
+<div id="compare" class="fixed-bottom d-flex justify-content-center py-2 hide-important">
+    <a href="#section-result" id="compare-btn" class="btn btn-primary">Compare</a>
+</div>
 
 <script
         src="https://code.jquery.com/jquery-3.3.1.min.js"

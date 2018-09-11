@@ -57,6 +57,7 @@ function parseSimc() {
     getGearData(gear);
 
     $('#compare-btn').click(function () {
+        $('#section-result').show();
         combinations = compare(selectedGear);
         displayResult(simcInput, combinations);
     });
@@ -66,6 +67,7 @@ function parseSimc() {
 function resetDom() {
     $('#section-gear').hide();
     $('#section-result').hide();
+    $('#compare').addClass('hide-important');
     $('#section-loading').show();
     selectedGear = $.extend(true, {}, baseGearObj);
     combinations = [];
@@ -267,7 +269,7 @@ function loadTooltip(time) {
         setTimeout(function () {
             $('#section-loading').hide();
             $('#section-gear').show();
-            $('#section-result').show();
+            $('#compare').removeClass('hide-important');
         }, 100);
     }, !!time ? time : 500);
 }

@@ -12,6 +12,19 @@ hr {
     display: none;
 }
 
+#compare {
+    background-color: #151414;
+
+}
+
+#compare > a {
+    border-radius: 0;
+}
+
+.hide-important {
+    display: none !important;
+}
+
 .pointer {
     cursor: pointer
 }
